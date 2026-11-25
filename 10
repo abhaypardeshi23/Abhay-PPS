@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Check if the given year is a leap year
+bool isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+// Get the number of days in a specific month (1-indexed: 1 = Jan, 12 = Dec)
+int getDaysInMonth(int month, int year) {
+    int days[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (month == 2 && isLeapYear(year)) {
+        return 29;
+    }
+    return days[month];
+}
+
+// Get the day of the week for January 1st of the given year (0 = Sun, 1 = Mon, ..., 6 = Sat)
+int getStartDayOfYear(int year) {
+    int y = year - 1;
+    // Gregorian calendar formula for Jan 1
+    return (y * 365 + y / 4 - y / 100 + y / 400 + 1) % 7;
+}
+
+int main() {
+    int year;
+    const char *months[] = {
+        "", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
+
+    printf("Enter a year (e.g., 2026): ");
+    if (scanf("%d", &year) != 1 || year < 1) {
+        printf("Invalid year entered.\n");
+        return 1;
+    }
+
+    int currentDay = getStartDayOfYear(year);
+
+    printf("\n==============================\n");
+    printf("       CALENDAR - %d\n", year);
+    printf("==============================\n");
+
+    for (int month = 1; month <= 12; month++) {
+        int daysInMonth = getDaysInMonth(month, year);
+
+        printf("\n  ------------%s------------\n", months[month]);
+        printf("  Sun  Mon  Tue  Wed  Thu  Fri  Sat\n");
+
+        // Print leading spaces for the first week of the month
+        for (int space = 0; space < currentDay; space++) {
+            printf("     ");
+        }
+
+        // Print all days of the month
+        for (int day = 1; day <= daysInMonth; day++) {
+            printf("%5d", day);
+            currentDay++;
+
+            // Wrap to a new line after Saturday (7th column)
+            if (currentDay > 6) {
+                printf("\n");
+                currentDay = 0;
+            }
+        }
+
+        // Ensure a newline after the month finishes if it didn't end on Saturday
+        if (currentDay != 0) {
+            printf("\n");
+        }
+    }
+
+    return 0;
+}
